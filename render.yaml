@@ -46,3 +46,5 @@ services:
         sync: false
       - key: NOTIFICATION_SERVICE_URL
         value: http://localhost:4005
+      - key: LITE_MODE
+        value: "1"

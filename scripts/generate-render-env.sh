@@ -61,6 +61,9 @@ ARCJET_KEY=${ARCJET}
 # Bundled backend — keep localhost (services run in same container)
 NOTIFICATION_SERVICE_URL=http://localhost:4005
 
+# Render free tier — set 1 on 512MB plans
+LITE_MODE=1
+
 # Inngest Cloud — add after creating app at https://app.inngest.com
 # Serve URL: ${RENDER_API_URL}/api/inngest
 # INNGEST_EVENT_KEY=

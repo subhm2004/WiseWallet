@@ -37,28 +37,37 @@ if (gatewayArcjet) {
 
 // Health check for gateway + all services
 app.get("/health", async (_req, res) => {
+  const liteMode = process.env.LITE_MODE === "1";
   const services = [
-    { name: "auth", port: SERVICE_PORTS.AUTH },
-    { name: "account", port: SERVICE_PORTS.ACCOUNT },
-    { name: "transaction", port: SERVICE_PORTS.TRANSACTION },
-    { name: "budget", port: SERVICE_PORTS.BUDGET },
-    { name: "notification", port: SERVICE_PORTS.NOTIFICATION },
-    { name: "worker", port: SERVICE_PORTS.WORKER },
+    { name: "auth", port: SERVICE_PORTS.AUTH, required: true },
+    { name: "account", port: SERVICE_PORTS.ACCOUNT, required: true },
+    { name: "transaction", port: SERVICE_PORTS.TRANSACTION, required: true },
+    { name: "budget", port: SERVICE_PORTS.BUDGET, required: true },
+    { name: "notification", port: SERVICE_PORTS.NOTIFICATION, required: !liteMode },
+    { name: "worker", port: SERVICE_PORTS.WORKER, required: !liteMode },
   ];
 
   const status = await Promise.all(
-    services.map(async ({ name, port }) => {
+    services.map(async ({ name, port, required }) => {
       try {
         const r = await fetch(`http://localhost:${port}/health`);
         const data = await r.json();
-        return { name, status: "ok", ...data };
+        return { name, status: "ok", required, ...data };
       } catch {
-        return { name, status: "down" };
+        return { name, status: "down", required };
       }
     })
   );
 
-  res.json({ gateway: "ok", services: status });
+  const coreOk = status
+    .filter((s) => s.required)
+    .every((s) => s.status === "ok");
+
+  res.status(coreOk ? 200 : 503).json({
+    gateway: coreOk ? "ok" : "degraded",
+    liteMode,
+    services: status,
+  });
 });
 
 const proxyOptions = (target, pathRewrite) =>
