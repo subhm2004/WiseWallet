@@ -52,8 +52,9 @@ export function createService(name) {
   return {
     name,
     start(port, app) {
-      app.listen(port, () => {
-        console.log(`[${name}] running on port ${port}`);
+      const host = process.env.HOST || "0.0.0.0";
+      app.listen(port, host, () => {
+        console.log(`[${name}] running on http://${host}:${port}`);
       });
     },
   };

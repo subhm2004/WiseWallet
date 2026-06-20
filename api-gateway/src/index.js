@@ -11,11 +11,16 @@ import {
 
 const app = express();
 const WEB_URL = process.env.WEB_URL || "http://localhost:3000";
+const extraOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
 const gatewayArcjet = createGatewayArcjet();
+const PORT = Number(process.env.PORT) || SERVICE_PORTS.GATEWAY;
 
 app.use(
   cors({
-    origin: [WEB_URL, "http://localhost:3000"],
+    origin: [WEB_URL, "http://localhost:3000", ...extraOrigins],
     credentials: true,
   })
 );
@@ -170,4 +175,4 @@ app.use(
   })
 );
 
-createService("api-gateway").start(SERVICE_PORTS.GATEWAY, app);
+createService("api-gateway").start(PORT, app);

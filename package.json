@@ -17,6 +17,8 @@
     "dev:gateway": "npm run dev -w @wisewallet/api-gateway",
     "setup:env": "sh scripts/setup-env.sh",
     "build": "npm run generate -w @wisewallet/database && npm run build -w @wisewallet/frontend",
+    "build:backend": "npm install && npm run db:generate",
+    "start:backend": "sh scripts/start-backend.sh",
     "db:generate": "npm run generate -w @wisewallet/database",
     "db:migrate": "npm run migrate -w @wisewallet/database",
     "db:migrate:deploy": "npm run migrate:deploy -w @wisewallet/database",

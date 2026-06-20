@@ -1,0 +1,48 @@
+# WiseWallet — Render Blueprint (free-tier friendly bundled backend)
+# Docs: DEPLOY-RENDER.md
+#
+# Deploy: Render Dashboard → New → Blueprint → connect repo
+# Or: create one Web Service manually with the settings below.
+
+services:
+  - type: web
+    name: wisewallet-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install && npm run db:generate
+    startCommand: sh scripts/start-backend.sh
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: WEB_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: INTERNAL_SERVICE_SECRET
+        sync: false
+      - key: ARCJET_KEY
+        sync: false
+      - key: INNGEST_EVENT_KEY
+        sync: false
+      - key: INNGEST_SIGNING_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: NOTIFICATION_SERVICE_URL
+        value: http://localhost:4005
