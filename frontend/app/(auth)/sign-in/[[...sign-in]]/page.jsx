@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api, setAuthTokens } from "@/lib/api";
 import { Logo } from "@/components/logo";
+import { SearchParamsBoundary } from "@/components/search-params-boundary";
 import { safeRedirect, storeAuthRedirect } from "@/lib/auth-redirect";
 
 const FEATURES = [
@@ -27,7 +28,7 @@ const ERROR_MESSAGES = {
   auth_failed: "Sign in failed. Please try again.",
 };
 
-export default function SignInPage() {
+function SignInPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorCode = searchParams.get("error");
@@ -293,5 +294,13 @@ export default function SignInPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <SearchParamsBoundary>
+      <SignInPageContent />
+    </SearchParamsBoundary>
   );
 }

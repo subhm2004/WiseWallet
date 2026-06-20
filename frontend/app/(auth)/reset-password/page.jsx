@@ -10,8 +10,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { Logo } from "@/components/logo";
+import { SearchParamsBoundary } from "@/components/search-params-boundary";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
@@ -98,5 +99,13 @@ export default function ResetPasswordPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <SearchParamsBoundary>
+      <ResetPasswordPageContent />
+    </SearchParamsBoundary>
   );
 }

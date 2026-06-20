@@ -6,8 +6,9 @@ import { BarLoader } from "react-spinners";
 import { api } from "@/lib/api";
 import { defaultCategories } from "@/data/categories";
 import { AddTransactionForm } from "../_components/transaction-form";
+import { SearchParamsBoundary } from "@/components/search-params-boundary";
 
-export default function AddTransactionPage() {
+function AddTransactionPageContent() {
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
   const [accounts, setAccounts] = useState([]);
@@ -56,5 +57,13 @@ export default function AddTransactionPage() {
         onAccountsRefresh={refreshAccounts}
       />
     </div>
+  );
+}
+
+export default function AddTransactionPage() {
+  return (
+    <SearchParamsBoundary>
+      <AddTransactionPageContent />
+    </SearchParamsBoundary>
   );
 }

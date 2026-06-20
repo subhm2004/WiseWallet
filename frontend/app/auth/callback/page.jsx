@@ -5,8 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { setAuthTokens, api } from "@/lib/api";
 import { consumeAuthRedirect } from "@/lib/auth-redirect";
 import { BarLoader } from "react-spinners";
+import { SearchParamsBoundary } from "@/components/search-params-boundary";
 
-export default function AuthCallbackPage() {
+function AuthCallbackPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -38,5 +39,13 @@ export default function AuthCallbackPage() {
       <BarLoader color="hsl(var(--primary))" width={200} />
       <p className="text-muted-foreground">Signing you in...</p>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <SearchParamsBoundary className="mx-auto mt-20">
+      <AuthCallbackPageContent />
+    </SearchParamsBoundary>
   );
 }
