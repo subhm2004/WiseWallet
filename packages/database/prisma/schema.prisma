@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String        @id @default(uuid())
+  googleId          String?       @unique
+  email             String        @unique
+  passwordHash      String?
+  name              String?
+  imageUrl          String?
+  dashboardWidgets  Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  accounts          Account[]
+  budgets           Budget?
+  categoryBudgets   CategoryBudget[]
+  savingsGoals      SavingsGoal[]
+  splitGroups       SplitGroup[]
+  splitMemberships  SplitMember[]
+  categoryRules     CategoryRule[]
+  passwordResets    PasswordResetToken[]
+  sessions          UserSession[]
+  transactions      Transaction[]
+  emailLogs         EmailLog[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@map("user_sessions")
+}
+
+model Account {
+  id           String        @id @default(uuid())
+  name         String
+  type         AccountType
+  balance      Decimal       @default(0)
+  isDefault    Boolean       @default(false)
+  userId       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Transaction {
+  id                String             @id @default(uuid())
+  type              TransactionType
+  amount            Decimal
+  description       String?
+  date              DateTime
+  receiptUrl        String?
+  isRecurring       Boolean            @default(false)
+  recurringInterval RecurringInterval?
+  nextRecurringDate DateTime?
+  status            TransactionStatus  @default(COMPLETED)
+  userId            String
+  accountId         String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  category          String
+  lastProcessed     DateTime?
+  account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([accountId])
+  @@map("transactions")
+}
+
+model Budget {
+  id            String    @id @default(uuid())
+  amount        Decimal
+  userId        String    @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastAlertSent DateTime?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("budgets")
+}
+
+model CategoryBudget {
+  id            String    @id @default(uuid())
+  userId        String
+  category      String
+  amount        Decimal
+  lastAlertSent DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category])
+  @@index([userId])
+  @@map("category_budgets")
+}
+
+model SavingsGoal {
+  id           String    @id @default(uuid())
+  userId       String
+  name         String
+  targetAmount Decimal
+  savedAmount  Decimal   @default(0)
+  deadline     DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("savings_goals")
+}
+
+model EmailLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  to          String
+  subject     String
+  type        String   @default("general")
+  referenceId String?
+  status      String   @default("sent")
+  error       String?
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([referenceId])
+  @@index([createdAt])
+  @@map("email_logs")
+}
+
+model SplitGroup {
+  id          String         @id @default(uuid())
+  userId      String
+  title       String
+  inviteToken String         @unique @default(uuid())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  members     SplitMember[]
+  expenses    SplitExpense[]
+  settlements SplitSettlement[]
+
+  @@index([userId])
+  @@index([inviteToken])
+  @@map("split_groups")
+}
+
+model SplitMember {
+  id           String         @id @default(uuid())
+  groupId      String
+  name         String
+  userId       String?
+  group        SplitGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user         User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  expensesPaid    SplitExpense[]    @relation("Payer")
+  shares          SplitShare[]
+  settlementsFrom SplitSettlement[] @relation("SettlementsFrom")
+  settlementsTo   SplitSettlement[] @relation("SettlementsTo")
+
+  @@index([groupId])
+  @@map("split_members")
+}
+
+model SplitExpense {
+  id          String       @id @default(uuid())
+  groupId     String
+  description String
+  amount      Decimal
+  payerId     String
+  createdAt   DateTime     @default(now())
+  group       SplitGroup   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  payer       SplitMember  @relation("Payer", fields: [payerId], references: [id], onDelete: Cascade)
+  shares      SplitShare[]
+
+  @@index([groupId])
+  @@map("split_expenses")
+}
+
+model SplitShare {
+  id        String       @id @default(uuid())
+  expenseId String
+  memberId  String
+  amount    Decimal
+  expense   SplitExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  member    SplitMember  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([expenseId])
+  @@map("split_shares")
+}
+
+model SplitSettlement {
+  id           String      @id @default(uuid())
+  groupId      String
+  fromMemberId String
+  toMemberId   String
+  amount       Decimal
+  note         String?
+  createdAt    DateTime    @default(now())
+  group        SplitGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromMember   SplitMember @relation("SettlementsFrom", fields: [fromMemberId], references: [id], onDelete: Cascade)
+  toMember     SplitMember @relation("SettlementsTo", fields: [toMemberId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@map("split_settlements")
+}
+
+model CategoryRule {
+  id        String   @id @default(uuid())
+  userId    String
+  pattern   String
+  category  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pattern])
+  @@index([userId])
+  @@map("category_rules")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("password_reset_tokens")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum AccountType {
+  CURRENT
+  SAVINGS
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum RecurringInterval {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}

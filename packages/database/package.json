@@ -1,0 +1,21 @@
+{
+  "name": "@wisewallet/database",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "push": "prisma db push",
+    "studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.5.0"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  }
+}

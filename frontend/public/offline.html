@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline — WiseWallet</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: #fafafa;
+        color: #171717;
+        text-align: center;
+        padding: 24px;
+      }
+      .card {
+        max-width: 360px;
+        padding: 32px;
+        border-radius: 16px;
+        border: 1px solid #e5e5e5;
+        background: white;
+      }
+      h1 { font-size: 1.25rem; margin: 0 0 8px; }
+      p { color: #737373; margin: 0 0 20px; line-height: 1.5; }
+      a {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #f97316;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>You're offline</h1>
+      <p>WiseWallet needs internet for live data. Cached pages may still work when you reconnect.</p>
+      <a href="/dashboard">Try again</a>
+    </div>
+  </body>
+</html>

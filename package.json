@@ -1,0 +1,32 @@
+{
+  "name": "wisewallet-platform",
+  "version": "0.2.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "api-gateway",
+    "server/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n gateway,auth,account,txn,budget,notify,worker,frontend,inngest -c blue,green,yellow,magenta,cyan,white,red,gray,magenta \"npm run dev -w @wisewallet/api-gateway\" \"npm run dev -w @wisewallet/auth-service\" \"npm run dev -w @wisewallet/account-service\" \"npm run dev -w @wisewallet/transaction-service\" \"npm run dev -w @wisewallet/budget-service\" \"npm run dev -w @wisewallet/notification-service\" \"npm run dev -w @wisewallet/worker-service\" \"npm run dev -w @wisewallet/frontend\" \"npm run dev:inngest\"",
+    "dev:clean": "npm run clean && npm run dev",
+    "clean": "sh scripts/clean-cache.sh",
+    "dev:inngest": "npx inngest-cli@latest dev -u http://localhost:4006/api/inngest",
+    "dev:frontend": "npm run dev -w @wisewallet/frontend",
+    "dev:gateway": "npm run dev -w @wisewallet/api-gateway",
+    "setup:env": "sh scripts/setup-env.sh",
+    "build": "npm run generate -w @wisewallet/database && npm run build -w @wisewallet/frontend",
+    "db:generate": "npm run generate -w @wisewallet/database",
+    "db:migrate": "npm run migrate -w @wisewallet/database",
+    "db:migrate:deploy": "npm run migrate:deploy -w @wisewallet/database",
+    "db:push": "npm run push -w @wisewallet/database",
+    "db:studio": "npm run studio -w @wisewallet/database",
+    "db:seed": "npm run seed -w @wisewallet/transaction-service --",
+    "email:test": "npm run email:test -w @wisewallet/notification-service --",
+    "email:budget-alert": "npm run email:budget-alert -w @wisewallet/worker-service --"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

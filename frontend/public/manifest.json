@@ -1,0 +1,18 @@
+{
+  "name": "WiseWallet",
+  "short_name": "WiseWallet",
+  "description": "Track expenses, budgets, and savings in INR",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

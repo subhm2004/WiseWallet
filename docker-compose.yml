@@ -1,0 +1,57 @@
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    env_file: ./api-gateway/.env
+    depends_on:
+      - auth-service
+      - account-service
+      - transaction-service
+      - budget-service
+
+  auth-service:
+    build: ./server/auth-service
+    ports:
+      - "4001:4001"
+    env_file: ./server/auth-service/.env
+
+  account-service:
+    build: ./server/account-service
+    ports:
+      - "4002:4002"
+    env_file: ./server/account-service/.env
+
+  transaction-service:
+    build: ./server/transaction-service
+    ports:
+      - "4003:4003"
+    env_file: ./server/transaction-service/.env
+
+  budget-service:
+    build: ./server/budget-service
+    ports:
+      - "4004:4004"
+    env_file: ./server/budget-service/.env
+
+  notification-service:
+    build: ./server/notification-service
+    ports:
+      - "4005:4005"
+    env_file: ./server/notification-service/.env
+
+  worker-service:
+    build: ./server/worker-service
+    ports:
+      - "4006:4006"
+    env_file: ./server/worker-service/.env
+    depends_on:
+      - notification-service
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    env_file: ./frontend/.env
+    depends_on:
+      - api-gateway
