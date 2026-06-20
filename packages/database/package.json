@@ -1,6 +1,7 @@
 {
   "name": "@wisewallet/database",
   "version": "1.0.0",
+  "type": "module",
   "main": "./src/index.js",
   "scripts": {
     "generate": "prisma generate",

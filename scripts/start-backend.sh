@@ -4,6 +4,15 @@
 
 set -e
 
+PORTS="4001 4002 4003 4004 4005 4006 8080"
+for p in $PORTS; do
+  if lsof -ti :"$p" >/dev/null 2>&1; then
+    echo "[start-backend] ERROR: Port $p is already in use."
+    echo "[start-backend] Stop npm run dev first, or run: npm run stop:services"
+    exit 1
+  fi
+done
+
 echo "[start-backend] Starting internal services..."
 
 npm run start -w @wisewallet/auth-service &

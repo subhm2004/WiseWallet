@@ -19,6 +19,7 @@
     "build": "npm run generate -w @wisewallet/database && npm run build -w @wisewallet/frontend",
     "build:backend": "npm install && npm run db:generate",
     "start:backend": "sh scripts/start-backend.sh",
+    "stop:services": "sh scripts/stop-services.sh",
     "db:generate": "npm run generate -w @wisewallet/database",
     "db:migrate": "npm run migrate -w @wisewallet/database",
     "db:migrate:deploy": "npm run migrate:deploy -w @wisewallet/database",
