@@ -4,6 +4,7 @@ import cors from "cors";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import {
   SERVICE_PORTS,
+  getServiceUrls,
   createService,
   createGatewayArcjet,
   arcjetGatewayMiddleware,
@@ -17,6 +18,7 @@ const extraOrigins = (process.env.CORS_ORIGINS || "")
   .filter(Boolean);
 const gatewayArcjet = createGatewayArcjet();
 const PORT = Number(process.env.PORT) || SERVICE_PORTS.GATEWAY;
+const services = getServiceUrls();
 
 app.use(
   cors({
@@ -38,23 +40,27 @@ if (gatewayArcjet) {
 // Health check for gateway + all services
 app.get("/health", async (_req, res) => {
   const liteMode = process.env.LITE_MODE === "1";
-  const services = [
-    { name: "auth", port: SERVICE_PORTS.AUTH, required: true },
-    { name: "account", port: SERVICE_PORTS.ACCOUNT, required: true },
-    { name: "transaction", port: SERVICE_PORTS.TRANSACTION, required: true },
-    { name: "budget", port: SERVICE_PORTS.BUDGET, required: true },
-    { name: "notification", port: SERVICE_PORTS.NOTIFICATION, required: !liteMode },
-    { name: "worker", port: SERVICE_PORTS.WORKER, required: !liteMode },
+  const checks = [
+    { name: "auth", url: services.auth, required: true },
+    { name: "account", url: services.account, required: true },
+    { name: "transaction", url: services.transaction, required: true },
+    { name: "budget", url: services.budget, required: true },
+    {
+      name: "notification",
+      url: services.notification,
+      required: !liteMode,
+    },
+    { name: "worker", url: services.worker, required: !liteMode },
   ];
 
   const status = await Promise.all(
-    services.map(async ({ name, port, required }) => {
+    checks.map(async ({ name, url, required }) => {
       try {
-        const r = await fetch(`http://localhost:${port}/health`);
+        const r = await fetch(`${url}/health`);
         const data = await r.json();
-        return { name, status: "ok", required, ...data };
+        return { name, url, status: "ok", required, ...data };
       } catch {
-        return { name, status: "down", required };
+        return { name, url, status: "down", required };
       }
     })
   );
@@ -102,7 +108,7 @@ const proxyOptions = (target, pathRewrite) =>
 // Auth Service - public routes
 app.use(
   "/api/auth",
-  proxyOptions(`http://localhost:${SERVICE_PORTS.AUTH}`, {
+  proxyOptions(services.auth, {
     "^/api/auth": "",
   })
 );
@@ -110,7 +116,7 @@ app.use(
 // Account Service - protected
 app.use(
   "/api/accounts",
-  proxyOptions(`http://localhost:${SERVICE_PORTS.ACCOUNT}`, {
+  proxyOptions(services.account, {
     "^/api/accounts": "",
   })
 );
@@ -118,7 +124,7 @@ app.use(
 // Transaction Service - protected
 app.use(
   "/api/transactions",
-  proxyOptions(`http://localhost:${SERVICE_PORTS.TRANSACTION}`, {
+  proxyOptions(services.transaction, {
     "^/api/transactions": "",
   })
 );
@@ -127,7 +133,7 @@ app.use(
 // Mount strips "/api/splits" — rewrite remainder to "/splits/..."
 app.use(
   "/api/splits",
-  proxyOptions(`http://localhost:${SERVICE_PORTS.TRANSACTION}`, (path) => {
+  proxyOptions(services.transaction, (path) => {
     const suffix = path === "/" ? "" : path;
     return `/splits${suffix}`;
   })
@@ -136,7 +142,7 @@ app.use(
 // Seed test data (transaction-service)
 app.use(
   "/api/seed",
-  proxyOptions(`http://localhost:${SERVICE_PORTS.TRANSACTION}`, (path) => {
+  proxyOptions(services.transaction, (path) => {
     const suffix = path === "/" ? "" : path;
     return `/seed${suffix}`;
   })
@@ -145,7 +151,7 @@ app.use(
 // Budget Service - protected
 app.use(
   "/api/budgets",
-  proxyOptions(`http://localhost:${SERVICE_PORTS.BUDGET}`, {
+  proxyOptions(services.budget, {
     "^/api/budgets": "",
   })
 );
@@ -153,7 +159,7 @@ app.use(
 // Notification Service - email history + test send
 app.use(
   "/api/notifications",
-  proxyOptions(`http://localhost:${SERVICE_PORTS.NOTIFICATION}`, {
+  proxyOptions(services.notification, {
     "^/api/notifications": "",
   })
 );
@@ -162,7 +168,7 @@ app.use(
 app.use(
   "/api/inngest",
   createProxyMiddleware({
-    target: `http://localhost:${SERVICE_PORTS.WORKER}`,
+    target: services.worker,
     changeOrigin: true,
     pathRewrite: (path) => `/api/inngest${path === "/" ? "" : path}`,
     timeout: 120000,

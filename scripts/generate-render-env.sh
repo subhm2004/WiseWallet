@@ -59,7 +59,13 @@ INTERNAL_SERVICE_SECRET=${INTERNAL}
 ARCJET_KEY=${ARCJET}
 
 # Bundled backend — keep localhost (services run in same container)
+# Individual deploy: set URLs on gateway service only (see api-gateway/.env.example)
+# AUTH_SERVICE_URL=http://localhost:4001
+# ACCOUNT_SERVICE_URL=http://localhost:4002
+# TRANSACTION_SERVICE_URL=http://localhost:4003
+# BUDGET_SERVICE_URL=http://localhost:4004
 NOTIFICATION_SERVICE_URL=http://localhost:4005
+# WORKER_SERVICE_URL=http://localhost:4006
 
 # Render free tier — set 1 on 512MB plans
 LITE_MODE=1

@@ -1,14 +1,7 @@
 import jwt from "jsonwebtoken";
 
-export const SERVICE_PORTS = {
-  GATEWAY: 8080,
-  AUTH: 4001,
-  ACCOUNT: 4002,
-  TRANSACTION: 4003,
-  BUDGET: 4004,
-  NOTIFICATION: 4005,
-  WORKER: 4006,
-};
+export { SERVICE_PORTS } from "./ports.js";
+export { getServiceUrls, resolveServiceUrl } from "./service-urls.js";
 
 export function signToken(payload, secret, expiresIn = "7d") {
   return jwt.sign(payload, secret, { expiresIn });
