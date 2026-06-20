@@ -487,4 +487,7 @@ app.post("/verify", (req, res) => {
   }
 });
 
-createService("auth-service").start(SERVICE_PORTS.AUTH, app);
+createService("auth-service").start(
+  Number(process.env.PORT) || SERVICE_PORTS.AUTH,
+  app
+);

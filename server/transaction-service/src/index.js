@@ -713,4 +713,7 @@ app.put("/:id", requireAuth, async (req, res) => {
   }
 });
 
-createService("transaction-service").start(SERVICE_PORTS.TRANSACTION, app);
+createService("transaction-service").start(
+  Number(process.env.PORT) || SERVICE_PORTS.TRANSACTION,
+  app
+);

@@ -269,4 +269,7 @@ app.delete("/:id", requireAuth, async (req, res) => {
   }
 });
 
-createService("account-service").start(SERVICE_PORTS.ACCOUNT, app);
+createService("account-service").start(
+  Number(process.env.PORT) || SERVICE_PORTS.ACCOUNT,
+  app
+);

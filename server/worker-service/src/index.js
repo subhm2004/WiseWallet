@@ -43,5 +43,8 @@ app.post("/test/trigger", async (req, res) => {
   res.json({ success: true, result });
 });
 
-createService("worker-service").start(SERVICE_PORTS.WORKER, app);
+createService("worker-service").start(
+  Number(process.env.PORT) || SERVICE_PORTS.WORKER,
+  app
+);
 console.log("[worker-service] Inngest functions registered at /api/inngest");

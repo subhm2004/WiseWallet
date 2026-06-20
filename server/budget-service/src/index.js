@@ -253,4 +253,7 @@ app.put("/", requireAuth, async (req, res) => {
   }
 });
 
-createService("budget-service").start(SERVICE_PORTS.BUDGET, app);
+createService("budget-service").start(
+  Number(process.env.PORT) || SERVICE_PORTS.BUDGET,
+  app
+);

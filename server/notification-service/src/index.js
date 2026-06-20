@@ -137,4 +137,7 @@ app.post("/test", requireAuth, async (req, res) => {
   }
 });
 
-createService("notification-service").start(SERVICE_PORTS.NOTIFICATION, app);
+createService("notification-service").start(
+  Number(process.env.PORT) || SERVICE_PORTS.NOTIFICATION,
+  app
+);
