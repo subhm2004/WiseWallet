@@ -25,9 +25,10 @@ EMAIL_FROM=$(read_env "$ROOT/server/notification-service/.env" EMAIL_FROM)
 INTERNAL=$(read_env "$ROOT/server/notification-service/.env" INTERNAL_SERVICE_SECRET)
 ARCJET=$(read_env "$ROOT/api-gateway/.env" ARCJET_KEY)
 
-# Override with env or defaults — edit after first deploy
-RENDER_API_URL="${RENDER_API_URL:-https://wisewallet-api.onrender.com}"
-VERCEL_APP_URL="${VERCEL_APP_URL:-https://wisewallet.vercel.app}"
+# Override: localhost until Render + Vercel URLs exist. After deploy run:
+#   RENDER_API_URL=https://YOUR.onrender.com VERCEL_APP_URL=https://YOUR.vercel.app npm run render:env
+RENDER_API_URL="${RENDER_API_URL:-http://localhost:8080}"
+VERCEL_APP_URL="${VERCEL_APP_URL:-http://localhost:3000}"
 
 cat > "$OUT" <<EOF
 # WiseWallet — Render Web Service environment variables
@@ -67,4 +68,6 @@ NOTIFICATION_SERVICE_URL=http://localhost:4005
 EOF
 
 echo "[render:env] Wrote $OUT"
-echo "[render:env] Open file → copy all KEY=value lines → Render Dashboard → Environment"
+echo "[render:env] WEB_URL=${VERCEL_APP_URL}"
+echo "[render:env] GOOGLE_CALLBACK=${RENDER_API_URL}/api/auth/google/callback"
+echo "[render:env] After deploy: RENDER_API_URL=https://xxx.onrender.com VERCEL_APP_URL=https://xxx.vercel.app npm run render:env"
